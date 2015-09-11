@@ -20,7 +20,7 @@ L.TileLayer.addInitHook(function() {
 });
 
 L.TileLayer.prototype.options.useCache     = false;
-L.TileLayer.prototype.options.saveToCache  = true;
+L.TileLayer.prototype.options.saveToCache  = false;
 L.TileLayer.prototype.options.useOnlyCache = false;
 L.TileLayer.prototype.options.cacheMaxAge  = 24*3600*1000;
 
@@ -53,6 +53,7 @@ L.TileLayer.include({
 		}
 
 		tile.src = tileUrl;
+        //console.log(tile);
 		return tile;
 	},
 
@@ -81,7 +82,7 @@ L.TileLayer.include({
 					}
 				} else {
 					// Serve tile from cached data
-					console.log('Tile is cached: ', tileUrl);
+					console.log('Tile is in the cache: ', tileUrl);
 					tile.onload = L.bind(this._tileOnLoad, this, done, tile);
 					tile.src = data.dataUrl;    // data.dataUrl is already a base64-encoded PNG image.
 				}
@@ -97,10 +98,13 @@ L.TileLayer.include({
 					tile.src = L.Util.emptyImageUrl;
 				} else {
 					// Online, not cached, request the tile normally
-// 					console.log('Requesting tile normally', tileUrl);
+                    
+ 					console.log('Requesting tile normally', tileUrl);
 					if (this.options.saveToCache) {
+                        console.log("saving to cache");
 						tile.onload = L.bind(this._saveTile, this, tile, tileUrl, null, done);
 					} else {
+                        console.log("not saving to cache");
 						tile.onload = L.bind(this._tileOnLoad, this, done, tile);
 					}
 					tile.crossOrigin = 'Anonymous';
@@ -131,7 +135,9 @@ L.TileLayer.include({
 		this._db.put(doc, tileUrl, doc.timestamp);
 
 		if (done) { done(); }
-	},
+	}
+    
+/*    ,
 
 
 	// Seeds the cache given a bounding box (latLngBounds), and
@@ -139,6 +145,7 @@ L.TileLayer.include({
 	// Use with care! This can spawn thousands of requests and
 	//   flood tileservers!
 	seed: function(bbox, minZoom, maxZoom) {
+        console.log("call seed");
 		if (minZoom > maxZoom) return;
 		if (!this._map) return;
 
@@ -150,8 +157,12 @@ L.TileLayer.include({
 			var southWestPoint = this._map.project(bbox.getSouthWest(),z);
 
 			// Calculate tile indexes as per L.TileLayer._update and
-			//   L.TileLayer._addTilesFromCenterOut
-			var tileSize   = this._getTileSize();
+			//   L.TileLayer._addTilesFromCenterOut 
+            
+            //take out the underscore. 
+            var tileSize = this.getTileSize();
+            console.log(this.getTileSize());
+             
 			var tileBounds = L.bounds(
 				northEastPoint.divideBy(tileSize)._floor(),
 				southWestPoint.divideBy(tileSize)._floor());
@@ -172,8 +183,10 @@ L.TileLayer.include({
 			queueLength: queue.length
 		}
 		this.fire('seedstart', seedData);
-		var tile = this._createTile();
-		tile._layer = this;
+        
+        //leave out the underscore in this._createTile() 
+		var tile = this.createTile();
+		tile._layer = this;       //will this need to be cacheLayer???
 		this._seedOneTile(tile, queue, seedData);
 	},
 
@@ -209,7 +222,7 @@ L.TileLayer.include({
 			}
 		}.bind(this));
 
-	}
+	}*/
 
 });
 

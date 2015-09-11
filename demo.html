@@ -9,40 +9,58 @@
 </head>
 <body>
 	<div id="map" style="width: 600px; height: 400px"></div>
-
-	<button onclick="seed()">Seed world from Z=0 until Z=4</div>
-
-	<script src="http://cdn.leafletjs.com/leaflet-1.0.0-b1/leaflet-src.js"></script>
-	<script src="bower_components/pouchdb/dist/pouchdb.js"></script>
+    <button onclick="startCache()">Start Caching</div>
+	<button onclick="stopCache()">Stop Caching</div>
+    
+    <script src="pouchdb-4.0.1.min.js"></script>
+   	<script src="http://cdn.leafletjs.com/leaflet-1.0.0-b1/leaflet-src.js"></script>
+	<!--<script src="bower_components/pouchdb/dist/pouchdb.js"></script>-->
 	<script src="L.TileLayer.PouchDBCached.js"></script>
 	<script>
 
 // 		var map = L.map('map').setView([63.41784,10.40359], 5);
 		var map = L.map('map').setView([40,-100], 4);
 
-		var layer = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+		var cacheLayer = L.tileLayer(
+            //'https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png'
+          // 'http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.jpg'
+            'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+            , {
 			maxZoom: 18,
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-			id: 'examples.map-i875mjb7',
-			useCache: true
+			attribution: 
+                'Map tiles by <a href="http://cartodb.com/attributions#basemaps">CartoDB</a>, under <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>. Data by <a href="http://www.openstreetmap.org/">OpenStreetMap</a>, under ODbL.</span>',
+            
+              //  'Map data &copy; <a href="www.stamen.com">StamenDesign</a>',
+                //'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' + 'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+			//id: 'examples.map-i875mjb7',
+			useCache: true,
+            saveToCache: false
 		});
 
 		// Listen to cache hits and misses and spam the console
-		// The cache hits and misses are only from this layer, not from the WMS layer.
-		layer.on('tilecachehit',function(ev){
-			console.log('Cache hit: ', ev.url);
+		// The cache hits and misses are only from this cacheLayer, not from the WMS layer.
+		cacheLayer.on('tilecachehit',function(ev){
+			//console.log('Cache hit: ', ev.url);
 		});
-		layer.on('tilecachemiss',function(ev){
-			console.log('Cache miss: ', ev.url);
+		cacheLayer.on('tilecachemiss',function(ev){
+			console.log('Tile not found in the cache: ', ev.url);
 		});
 
-		layer.addTo(map);
+		cacheLayer.addTo(map);
 
+function startCache(){
+    console.log('start caching'); 
+    console.log("cacheLayer: ", cacheLayer);
+    cacheLayer.options.saveToCache = true;
+    
+}       
+function stopCache(){
+    console.log('stop caching'); 
+    cacheLayer.options.saveToCache = false;
+    
+}
 
-
-
+/*
 
 		var wmsLayer = L.tileLayer.wms("http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi", {
 			layers: 'nexrad-n0r-900913',
@@ -55,24 +73,24 @@
 		});
 
 		wmsLayer.addTo(map);
+*/
 
 
 
-
-		// Seed the base layer, for the whole world, for zoom levels 0 through 4.
-		function seed() {
+		// Seed the base layer, for the whole world, for zoom levels 1 through 4.
+/*		function seed() {
 			var bbox = L.latLngBounds(L.latLng(-85,-180), L.latLng(85,180));
-			layer.seed( bbox, 0, 4 );
+			cacheLayer.seed( bbox, 1, 4 );
 		}
 
 		// Display seed progress on console
-		layer.on('seedprogress', function(seedData){
+		cacheLayer.on('seedprogress', function(seedData){
 			var percent = 100 - Math.floor(seedData.remainingLength / seedData.queueLength * 100);
 			console.log('Seeding ' + percent + '% done');
 		});
-		layer.on('seedend', function(seedData){
+		cacheLayer.on('seedend', function(seedData){
 			console.log('Cache seeding complete');
-		});
+		});*/
 
 	</script>
 </body>
